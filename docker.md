@@ -201,3 +201,35 @@ PS C:\> docker exec -it 66961deec919 redis-cli
 ```
 And it shows the redis prompt
 
+Here the parameters -it actually stands for 
+
+> -i : input
+> 
+> -t : text formatting
+
+
+# Shell access to a docker container
+
+This is the most important thing in docker. We would like to have shell access. With the -it flag we can get shell access too.
+
+Practically:
+```sh
+# Confirm that a container is running, say redis
+docker ps --all
+docker -exec -it <container_id> sh 
+```
+![shell](img/exec_command.png)
+
+We can also run `redis-cli` directly from shell prompt.
+
+We can also call the shell from run command
+
+```sh
+docker run -it busybox sh
+```
+
+
+## How to build your own docker image
+
+
+
