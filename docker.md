@@ -135,3 +135,69 @@ docker system prune
 
 It should display an warning message and once confirmed, it will erase all docker containers from your local machine. Next time if you want to start it again, it will need to be downloaded again.
 
+
+#### View the logs of a docker container
+
+We can view the logs of a container while the docker is not deleted.
+
+```sh
+docker create busybox echo hello there
+PS C:\Users\xxx> docker start 8dea55842e1b3060de568cd53ecf53ee78f19bbeb998b6cf6a974eaab9dc3134
+8dea55842e1b3060de568cd53ecf53ee78f19bbeb998b6cf6a974eaab9dc3134
+PS C:\Users\xxx> docker logs 8dea55842e1b3060de568cd53ecf53ee78f19bbeb998b6cf6a974eaab9dc3134
+hi there
+```
+`docker logs <docker id>` will show what was the output. Here the docker is not restarted again. Just getting the logs.
+#### Stopping docker Container
+
+Imagine a situation where you have used `docker create busybox ping google.com` - this command will continiously keep pinging google. To stop such situation, we can either use `stop` or `kill` command.
+
+The primary difference between stop and kill is: stop allows some time to the internal process to do some cleanup - like saving a file, it actually says take your own time and then stop the process, internally it runs system `SIGTERM` command. But `kill` is not forgiving. It will immediately kill the entire process, no time to docker. Internally it runs `SIGKILL`. 
+
+In docker environment, a kill command is automatically invoked when stop command doesn't work for 10 seconds. That means it only gives 10 s to save whatever it needs to, then the process will have to face mighty kill command.
+
+
+```sh
+  docker create busybox ping google.com
+  docker start 7cebe61f1b8ad9467a76c797f8ba365e23565d388d0bf7d07782b4e3e6609bf4
+  docker logs 7cebe61f1b8ad9467a76c797f8ba365e23565d388d0bf7d07782b4e3e6609bf4
+  docker ps --all
+  docker stop 7cebe61f1b8ad9467a76c797f8ba365e23565d388d0bf7d07782b4e3e6609bf4
+  ```
+Stop can't handle ping that easily, so, it waits for 10 sec and then invokes the `kill` command automatically. Therefore, we can see that this is killed only after 10 seconds.
+
+On the other hand, it we invoke `kill`, the process stops immediately.
+
+```sh
+    docker kill <process-id>
+```
+
+### Running redis inside a docker.
+
+Lets install redis inside a docker. But how to start it. Because, to start redis inside the docker will require to get inside the docker and then issue the redis-cli command. 
+
+When we run `docker run redis` command, it starts redis as a server, but we need to access it from another terminal. 
+![Redis](img/redis.png)
+
+Even though it is ready to accept connection, no way to write the commands. If we start another terminal and put redis-cli command, it doesnot work as redis is not available from outside the docker container. 
+
+To address this issue, we will use `exec` command. This command is used to run an additional command inside a container.
+
+The systax of the command is:
+`docker exec -it <docker id> <Additional command>`
+
+Practically,
+```sh
+# run another terminal and get the docker id first
+PS C:\> docker ps -all
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS      NAMES
+66961deec919   redis     "docker-entrypoint.s…"   16 minutes ago   Up 16 minutes   6379/tcp   great_brattain
+
+# Run exec command 
+#docker exec -it 66961deec919 redis-cli
+
+PS C:\> docker exec -it 66961deec919 redis-cli
+127.0.0.1:6379>
+```
+And it shows the redis prompt
+
