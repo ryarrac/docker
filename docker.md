@@ -106,3 +106,32 @@ ryarra@onbv:~$
 docker run is the combination of both docker create and docker start -a
 
 
+Once a docker ran, we can rerun it with its id. To see all dockers irrespective of running or stopped status, we can use
+
+```docker
+docker ps --all
+```
+By fetching the docker id of a stopped container, we can rerun the docker again. However, if initially we had given a override command, this new run will also run the same command.
+
+Say, we initially provided the command 
+```docker
+docker run busybox echo hello world
+```
+and assume that the docker had an id say <somne id>
+
+if we issue the command
+
+```docker
+docker start -a <some id>
+``` 
+will also echo nhello world. However, if we don't provide `-a`, it will supress the `hello world` part. 
+
+#### Erase the existing containers completely
+
+To completely erase the containers, issue
+```docker
+docker system prune
+```
+
+It should display an warning message and once confirmed, it will erase all docker containers from your local machine. Next time if you want to start it again, it will need to be downloaded again.
+
